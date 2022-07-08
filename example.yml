@@ -2,34 +2,36 @@ version: 1
 
 groups:
   example:
+    defaults:
+      host: {variables.host}
+
+      headers:
+          Authorization: JWT {variables.token}
+
     requests:
       echo:
         method: get
-        host: "{host}"
         endpoint: /
 
         query:
           value:
-            if: "{host}"
-            then: "{host}"
+            if: {variables.token}
+            then: {variables.token}
             else: null
 
-        headers:
-          Authorization: JWT {token}
+      variables:
+        host:
+          source:
+            - cli:
+                map:
+                  local: http://localhost:8000
+                default: local
+          required: true
 
-        variables:
-          host:
-            source:
-              - cli:
-                  map:
-                    local: http://localhost:8000
-                  default: local
-            required: true
-
-          token:
-            source:
-              - storage:
-                  key: key
-                  scope: request
-              - cli:
-            required: false
+        token:
+          source:
+            - storage:
+                key: key
+                scope: request
+            - cli:
+          required: false
