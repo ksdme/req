@@ -1,0 +1,35 @@
+version: 1
+
+groups:
+  example:
+    requests:
+      echo:
+        method: get
+        host: "{host}"
+        endpoint: /
+
+        query:
+          value:
+            if: "{host}"
+            then: "{host}"
+            else: null
+
+        headers:
+          Authorization: JWT {token}
+
+        variables:
+          host:
+            source:
+              - cli:
+                  map:
+                    local: http://localhost:8000
+                  default: local
+            required: true
+
+          token:
+            source:
+              - storage:
+                  key: key
+                  scope: request
+              - cli:
+            required: false
