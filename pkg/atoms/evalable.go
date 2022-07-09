@@ -1,6 +1,8 @@
 package atoms
 
-import "strings"
+import (
+	"strings"
+)
 
 type Evalable interface {
 	Evaluate(context *Context) interface{}
@@ -47,30 +49,28 @@ func (conditional *ConditionalValue) Evaluate(context *Context) interface{} {
 
 	var thenValue interface{} = nil
 	if conditional.Then != nil {
-		condition = conditional.Then.Evaluate(context)
+		thenValue = conditional.Then.Evaluate(context)
 	}
 
 	var elseValue interface{} = nil
 	if conditional.Else != nil {
-		condition = conditional.Else.Evaluate(context)
+		elseValue = conditional.Else.Evaluate(context)
 	}
 
 	if condition != nil {
 		switch value := condition.(type) {
 		case string:
-			if strings.Trim(value, " \n\t") != "" {
+			if strings.TrimSpace(value) != "" {
 				return thenValue
 			}
+
+		case int, float32, float64:
+			return thenValue
 
 		case bool:
 			if value {
 				return thenValue
 			}
-
-		case int:
-		case float32:
-		case float64:
-			return thenValue
 		}
 	}
 
@@ -82,16 +82,10 @@ func (conditional *ConditionalValue) Evaluate(context *Context) interface{} {
 func CreateEvalable(value interface{}) Evalable {
 	// The terminal scalar values.
 	switch typedValue := value.(type) {
-	case int:
-	case float32:
-	case float64:
-	case string:
-		return NewLeafValue(value)
-
 	// Handle the case of nested objects.
 	// TODO: What if the map keys are integers?
 	case map[string]interface{}:
-		// Support the conditional operator values.
+		// Support the conditional values.
 		if ifValue, ok := typedValue["if"]; ok {
 			thenValue, ok := typedValue["then"]
 			if !ok {
@@ -109,6 +103,9 @@ func CreateEvalable(value interface{}) Evalable {
 				CreateEvalable(elseValue),
 			)
 		}
+
+	default:
+		return NewLeafValue(value)
 	}
 
 	// TODO: Should throw an error instead?
