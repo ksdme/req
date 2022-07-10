@@ -86,6 +86,7 @@ func CreateEvalable(value interface{}) Evalable {
 	// TODO: What if the map keys are integers?
 	case map[string]interface{}:
 		// Support the conditional values.
+		// TODO: Could we use something like map structure to deal with this instead?
 		if ifValue, ok := typedValue["if"]; ok {
 			thenValue, ok := typedValue["then"]
 			if !ok {
@@ -103,11 +104,7 @@ func CreateEvalable(value interface{}) Evalable {
 				CreateEvalable(elseValue),
 			)
 		}
-
-	default:
-		return NewLeafValue(value)
 	}
 
-	// TODO: Should throw an error instead?
-	return NewLeafValue(nil)
+	return NewLeafValue(value)
 }

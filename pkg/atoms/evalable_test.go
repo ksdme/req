@@ -137,3 +137,73 @@ func TestNestedConditionalCreateEvalable(t *testing.T) {
 		t.Error("Evaluated value and expected value did not match")
 	}
 }
+
+func TestCreateEvalableMissingBranch(t *testing.T) {
+	// Missing if branch.
+	evalable := atoms.CreateEvalable(
+		map[string]interface{}{
+			"if":   true,
+			"else": "else-value",
+		},
+	)
+	value := evalable.Evaluate(context())
+
+	if value != nil {
+		t.Error("Evaluated value and expected value did not match")
+	}
+
+	// Missing else branch.
+	evalable = atoms.CreateEvalable(
+		map[string]interface{}{
+			"if":   false,
+			"then": "then-value",
+		},
+	)
+	value = evalable.Evaluate(context())
+
+	if value != nil {
+		t.Error("Evaluated value and expected value did not match")
+	}
+
+	// Missing both branches.
+	evalable = atoms.CreateEvalable(
+		map[string]interface{}{
+			"if": false,
+		},
+	)
+	value = evalable.Evaluate(context())
+
+	if value != nil {
+		t.Error("Evaluated value and expected value did not match")
+	}
+}
+
+func TestStringConditional(t *testing.T) {
+	// The conditional value is truthy.
+	evalable := atoms.CreateEvalable(
+		map[string]interface{}{
+			"if":   "truthy",
+			"then": "then-value",
+			"else": "else-value",
+		},
+	)
+	value := evalable.Evaluate(context())
+
+	if value != "then-value" {
+		t.Error("Evaluated value and expected value did not match")
+	}
+
+	// Conditional value is falsy.
+	evalable = atoms.CreateEvalable(
+		map[string]interface{}{
+			"if":   "",
+			"then": "then-value",
+			"else": "else-value",
+		},
+	)
+	value = evalable.Evaluate(context())
+
+	if value != "else-value" {
+		t.Error("Evaluated value and expected value did not match")
+	}
+}
