@@ -64,13 +64,13 @@ func (conditional *ConditionalValue) Evaluate(context *Context) interface{} {
 				return thenValue
 			}
 
-		case int, float32, float64:
-			return thenValue
-
 		case bool:
 			if value {
 				return thenValue
 			}
+
+		case int, float32, float64:
+			return thenValue
 		}
 	}
 
