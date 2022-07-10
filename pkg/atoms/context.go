@@ -4,3 +4,7 @@ package atoms
 type Context struct {
 	Variables map[string]interface{}
 }
+
+func EmptyContext() *Context {
+	return &Context{}
+}
